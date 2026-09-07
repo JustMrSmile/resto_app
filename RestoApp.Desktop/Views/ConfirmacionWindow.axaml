@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="RestoApp.Desktop.Views.ConfirmacionWindow"
+        Title="Confirmar Acción" Height="180" Width="380"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <StackPanel Margin="20" Spacing="20" VerticalAlignment="Center">
+        <!-- Ícono de advertencia y Texto -->
+        <TextBlock x:Name="TxtMensaje" 
+                   Text="¿Estás seguro?" 
+                   FontSize="16" 
+                   TextWrapping="Wrap" 
+                   HorizontalAlignment="Center" 
+                   TextAlignment="Center"/>
+
+        <!-- Botones de Acción -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15" Margin="0,15,0,0">
+            <Button Content="Cancelar" 
+                    Click="BtnNo_Click" 
+                    Width="100" 
+                    HorizontalContentAlignment="Center" 
+                    Background="#95A5A6" 
+                    Foreground="White" 
+                    Cursor="Hand"/>
+            
+            <Button Content="Sí, Dar de baja" 
+                    Click="BtnSi_Click" 
+                    Width="120" 
+                    HorizontalContentAlignment="Center" 
+                    Background="#E74C3C" 
+                    Foreground="White" 
+                    FontWeight="Bold" 
+                    Cursor="Hand"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

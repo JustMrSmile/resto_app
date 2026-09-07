@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="RestoApp.Business/RestoApp.Business.csproj" />
+  <Project Path="RestoApp.Data/RestoApp.Data.csproj" />
+  <Project Path="RestoApp.Desktop/RestoApp.Desktop.csproj" />
+  <Project Path="RestoApp.Entities/RestoApp.Entities.csproj" />
+</Solution>

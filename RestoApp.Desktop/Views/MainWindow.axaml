@@ -1,0 +1,98 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:RestoApp.Desktop.ViewModels"
+        x:Class="RestoApp.Desktop.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="RestoApp - Sistema de Gestión" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainViewModel/>
+    </Design.DataContext>
+    <Window.Styles>
+        <!-- Estilo base del boton -->
+        <Style Selector="Button.navBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#BDC3C7"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Padding" Value="0,12"/>
+            <Setter Property="Margin" Value="15,5"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Estilo del boton cuando el cursor esta encima -->
+        <Style Selector="Button.navBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#34495E"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Estilo del boton cuando esta seleccionado -->
+        <Style Selector="Button.navBtn.active /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+                <!-- Estilo para el boton de cerrar sesion-->
+        <Style Selector="Button.logoutBtn /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="#E74C3C"/>
+        </Style>
+        <Style Selector="Button.logoutBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#C0392B"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Styles>
+
+    <!-- GRID EXTERIOR: Divide la pantalla en Izquierda (220px) y Derecha (Resto) -->
+    <Grid ColumnDefinitions="220, *">
+        
+        <!-- ========================================== -->
+        <!-- COLUMNA 0: BARRA LATERAL (Con su propio Grid interno) -->
+        <!-- ========================================== -->
+        <Grid Grid.Column="0" Background="#2C3E50" RowDefinitions="*, Auto">
+            
+            <!-- Fila 0: Menú de Navegación (Arriba, ocupa el espacio disponible) -->
+            <StackPanel Grid.Row="0" Spacing="5">
+                <TextBlock Text="RestoApp" Foreground="White" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,30,0,30"/>
+                
+                <Button x:Name="BtnClientes" IsVisible="{Binding PuedeVerClientes}" Classes="navBtn" Content="Clientes" Click="MenuButton_Click" Command="{Binding IrAClientesCommand}"/>
+                <Button x:Name="BtnEmpleados" Classes="navBtn" Content="Empleados" Click="MenuButton_Click" Command="{Binding IrAEmpleadosCommand}"/>
+                <Button x:Name="BtnReservas" Classes="navBtn" Content="Reservas" Click="MenuButton_Click" Command="{Binding IrAReservasCommand}"/>
+                <Button x:Name="BtnMesas" Classes="navBtn active" Content="Mesas" Click="MenuButton_Click" Command="{Binding IrAMesasCommand}"/>
+            </StackPanel>
+
+            <!-- Fila 1: Área de Usuario y Logout (Abajo, se ajusta a su contenido) -->
+            <StackPanel Grid.Row="1" Spacing="10" Margin="15,20,15,30">
+                <!-- Tarjeta visual del Usuario -->
+                <Border Background="#34495E" CornerRadius="8" Padding="10">
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                        <Ellipse Width="30" Height="30" Fill="#3498DB"/>
+                        <!--<TextBlock Text="herna" Foreground="White" FontSize="16" VerticalAlignment="Center" FontWeight="SemiBold"/> -->
+                        <ComboBox SelectedIndex="{Binding IndiceRolSeleccionado}" 
+                                  Background="Transparent" Foreground="White" 
+                                  BorderThickness="0" Width="120">
+                            <ComboBoxItem Content="Admin"/>
+                            <ComboBoxItem Content="Mozo"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Botón de Cerrar Sesión -->
+                <Button Classes="navBtn logoutBtn" Content="Cerrar Sesión"/>
+            </StackPanel>
+            
+        </Grid>
+
+        <!-- ========================================== -->
+        <!-- COLUMNA 1: ÁREA CENTRAL DE CONTENIDO DINÁMICO -->
+        <!-- ========================================== -->
+        <Border Grid.Column="1" Background="#ECF0F1" Padding="20">
+            <ContentControl Content="{Binding CurrentView}" 
+                            HorizontalContentAlignment="Stretch" 
+                            VerticalContentAlignment="Stretch"/>
+        </Border>
+        
+    </Grid>
+</Window>

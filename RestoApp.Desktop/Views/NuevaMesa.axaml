@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="RestoApp.Desktop.Views.NuevaMesaWindow"
+        Title="Registrar Nueva Mesa" Height="350" Width="400"
+        WindowStartupLocation="CenterOwner">
+
+    <StackPanel Spacing="15" Margin="20">
+        <TextBlock Text="Datos de la Mesa" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+        
+        <TextBox x:Name="TxtNroMesa" PlaceholderText="Número de Mesa (Ej: 1)"/>
+        <TextBox x:Name="TxtCapacidad" PlaceholderText="Capacidad (Ej: 4 personas)"/>
+        
+        <!-- Aquí luego pondremos un ComboBox para seleccionar la ubicación real -->
+        <TextBox x:Name="TxtUbicacion" PlaceholderText="ID Ubicación"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+            <Button Content="Cancelar" Click="BtnCancelar_Click" Background="Transparent"/>
+            <Button Content="Guardar" Click="BtnGuardar_Click" Background="#3498DB" Foreground="White"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
