@@ -1,7 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using RestoApp.Desktop.ViewModels;
+using RestoApp.Entities;
 using System;
+
 namespace RestoApp.Desktop.Views;
 
 public partial class MesasView : UserControl
@@ -10,73 +12,122 @@ public partial class MesasView : UserControl
     {
         InitializeComponent();
     }
+
     private async void BtnNuevaMesa_Click(object? sender, RoutedEventArgs e)
     {
-        var formWindow = new NuevaMesaWindow();
+        if (DataContext is not MesasViewModel viewModel) return;
 
+        var formWindow = new NuevaMesaWindow(viewModel.Ubicaciones);
         var mainWindow = TopLevel.GetTopLevel(this) as Window;
 
-        if(mainWindow != null)
+        if (mainWindow != null)
         {
             await formWindow.ShowDialog(mainWindow);
-            //if(DataContext is MesaItemViewModel viewModel)
-            //{
-            //    await viewModel.CargarMesasAsync()
-            //}
+            if (formWindow.MesaResult != null)
+            {
+                await viewModel.GuardarMesaAsync(formWindow.MesaResult, formWindow.SelectedUbicacionId);
+            }
         }
     }
+
     private async void BtnEditar_Click(object? sender, RoutedEventArgs e)
     {
-        if (sender is Button btn && btn.DataContext is MesaItemViewModel mesaSeleccionada)
+        if (sender is Button btn && btn.DataContext is MesaItemViewModel mesaSeleccionada && DataContext is MesasViewModel viewModel)
         {
-            // Aquí puedes re-utilizar NuevaMesaWindow pasándole el ID en el constructor, 
-            // o crear una nueva EditarMesaWindow(mesaSeleccionada.IdMesa)
-            
-            var formEditar = new NuevaMesaWindow(); // Reemplazar con ventana de edición
+            var formEditar = new NuevaMesaWindow(mesaSeleccionada, viewModel.Ubicaciones);
             var mainWindow = TopLevel.GetTopLevel(this) as Window;
             
             if (mainWindow != null)
             {
                 await formEditar.ShowDialog(mainWindow);
-                // Recargar grilla tras editar
-                if (DataContext is MesasViewModel viewModel) await viewModel.CargarMesasAsync();
+                if (formEditar.MesaResult != null)
+                {
+                    await viewModel.GuardarMesaAsync(formEditar.MesaResult, formEditar.SelectedUbicacionId);
+                }
             }
         }
     }
 
-    // NUEVO: Lógica para el botón de Baja en la fila
     private async void BtnEliminar_Click(object? sender, RoutedEventArgs e)
-{
-    if (sender is Button btn && btn.DataContext is MesaItemViewModel mesaSeleccionada)
     {
-        var confirmacion = new ConfirmacionWindow($"¿Estás seguro de que deseas dar de baja la Mesa Nro {mesaSeleccionada.NroMesa}?");
-        var mainWindow = TopLevel.GetTopLevel(this) as Window;
-        
-        if (mainWindow != null)
+        if (sender is Button btn && btn.DataContext is MesaItemViewModel mesaSeleccionada)
         {
-            try
+            var confirmacion = new ConfirmacionWindow($"¿Estás seguro de que deseas dar de baja la Mesa Nro {mesaSeleccionada.NroMesa}?");
+            var mainWindow = TopLevel.GetTopLevel(this) as Window;
+            
+            if (mainWindow != null)
             {
-                // CAMBIO 1: Usar bool? (nullable) por si la ventana se cierra con la 'X' superior
-                bool? confirmados = await confirmacion.ShowDialog<bool?>(mainWindow);
-                
-                // CAMBIO 2: Validar estrictamente que el resultado sea true
-                if (confirmados == true)
+                try
                 {
-                    // Aquí ejecutarás tu lógica de base de datos más adelante
-                    // await _mesaService.DarDeBajaAsync(mesaSeleccionada.IdMesa);
-                    
-                    if (DataContext is MesasViewModel viewModel)
+                    bool? confirmados = await confirmacion.ShowDialog<bool?>(mainWindow);
+                    if (confirmados == true && DataContext is MesasViewModel viewModel)
                     {
-                        await viewModel.CargarMesasAsync();
+                        await viewModel.DarBajaMesaCommand.ExecuteAsync(mesaSeleccionada);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                // CAMBIO 3: Si algo falla (ej. error de SQL), se atrapa aquí y la app NO se cierra
-                Console.WriteLine($"Error crítico al intentar eliminar la mesa: {ex.Message}");
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error crítico al intentar eliminar la mesa: {ex.Message}");
+                }
             }
         }
     }
-}
+
+    private async void BtnNuevaUbicacion_Click(object? sender, RoutedEventArgs e)
+    {
+        var formWindow = new NuevaUbicacionWindow();
+        var mainWindow = TopLevel.GetTopLevel(this) as Window;
+
+        if (mainWindow != null)
+        {
+            await formWindow.ShowDialog(mainWindow);
+            if (formWindow.UbicacionResult != null && DataContext is MesasViewModel viewModel)
+            {
+                await viewModel.GuardarUbicacionAsync(formWindow.UbicacionResult);
+            }
+        }
+    }
+
+    private async void BtnEditarUbicacion_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is UbicacionMesa ubicacionSeleccionada)
+        {
+            var formEditar = new NuevaUbicacionWindow(ubicacionSeleccionada);
+            var mainWindow = TopLevel.GetTopLevel(this) as Window;
+
+            if (mainWindow != null)
+            {
+                await formEditar.ShowDialog(mainWindow);
+                if (formEditar.UbicacionResult != null && DataContext is MesasViewModel viewModel)
+                {
+                    await viewModel.GuardarUbicacionAsync(formEditar.UbicacionResult);
+                }
+            }
+        }
+    }
+
+    private async void BtnEliminarUbicacion_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is UbicacionMesa ubicacionSeleccionada)
+        {
+            var confirmacion = new ConfirmacionWindow($"¿Estás seguro de que deseas dar de baja / archivar la ubicación '{ubicacionSeleccionada.Ubicacion}'?");
+            var mainWindow = TopLevel.GetTopLevel(this) as Window;
+
+            if (mainWindow != null)
+            {
+                try
+                {
+                    bool? confirmados = await confirmacion.ShowDialog<bool?>(mainWindow);
+                    if (confirmados == true && DataContext is MesasViewModel viewModel)
+                    {
+                        await viewModel.DarBajaUbicacionCommand.ExecuteAsync(ubicacionSeleccionada);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al dar de baja la ubicación: {ex.Message}");
+                }
+            }
+        }
+    }
 }

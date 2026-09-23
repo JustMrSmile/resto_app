@@ -14,9 +14,68 @@ public class EmpleadoService
         _empleadoRepository = empleadoRepository;
     }
 
-    public async Task<IEnumerable<Empleado>> ObtenerEmpleadosAsync()
+    public async Task<IEnumerable<Empleado>> ObtenerEmpleadosAsync(bool soloActivos = true)
     {
-        // Ahora pedimos los empleados con todas sus tablas relacionadas
-        return await _empleadoRepository.GetEmpleadosConDetallesAsync();    
+        try
+        {
+            return await _empleadoRepository.GetEmpleadosSpAsync(soloActivos);
+        }
+        catch
+        {
+            return await _empleadoRepository.GetEmpleadosConDetallesAsync();
+        }
+    }
+
+    public async Task CrearEmpleadoAsync(long dni, string nombre, string apellido, string email, long telefono, string password, int idRol, int idTurno)
+    {
+        try
+        {
+            await _empleadoRepository.CrearEmpleadoSpAsync(dni, nombre, apellido, email, telefono, password, idRol, idTurno);
+        }
+        catch
+        {
+            var emp = new Empleado
+            {
+                DniEmpleado = dni,
+                IdRol = idRol,
+                IdTurno = idTurno > 0 ? idTurno : 1,
+                ActivoEnRol = true
+            };
+            await _empleadoRepository.AddAsync(emp);
+            await _empleadoRepository.SaveChangesAsync();
+        }
+    }
+
+    public async Task EditarEmpleadoAsync(long dni, string nombre, string apellido, string email, long telefono, int idRol)
+    {
+        var empleados = await _empleadoRepository.GetEmpleadosSpAsync(soloActivos: false);
+        var emp = System.Linq.Enumerable.FirstOrDefault(empleados, e => e.DniEmpleado == dni);
+        if (emp != null)
+        {
+            if (emp.PersonaInfo != null)
+            {
+                emp.PersonaInfo.Nombre = nombre;
+                emp.PersonaInfo.Apellido = apellido;
+                emp.PersonaInfo.Email = email;
+                emp.PersonaInfo.Telefono = telefono;
+            }
+            if (emp.IdRol != idRol)
+            {
+                await _empleadoRepository.BajaLogicaEmpleadoSpAsync(dni, emp.IdRol);
+                emp.IdRol = idRol;
+            }
+            _empleadoRepository.Update(emp);
+            await _empleadoRepository.SaveChangesAsync();
+        }
+    }
+
+    public async Task BajaLogicaEmpleadoAsync(long dniEmpleado, int idRol)
+    {
+        await _empleadoRepository.BajaLogicaEmpleadoSpAsync(dniEmpleado, idRol);
+    }
+
+    public async Task RestaurarEmpleadoAsync(long dniEmpleado, int idRol)
+    {
+        await _empleadoRepository.RestaurarEmpleadoSpAsync(dniEmpleado, idRol);
     }
 }

@@ -1,9 +1,10 @@
-using RestoApp.Entities;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using RestoApp.Entities;
 
 namespace RestoApp.Data.Repositories;
+
 
 public class EmpleadoRepository : Repository<Empleado>, IEmpleadoRepository
 {
@@ -12,8 +13,44 @@ public class EmpleadoRepository : Repository<Empleado>, IEmpleadoRepository
     public async Task<IEnumerable<Empleado>> GetEmpleadosConDetallesAsync()
     {
         return await _dbSet
+            .AsNoTracking()
             .Include(e => e.PersonaInfo) // Trae los datos de la Persona
             .Include(e => e.Rol)         // Trae los datos del RolEmpleado
             .ToListAsync();
-    }    
+    }
+
+    public async Task<IEnumerable<Empleado>> GetEmpleadosSpAsync(bool soloActivos = true)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Include(e => e.PersonaInfo)
+            .Include(e => e.Rol)
+            .Include(e => e.Turno)
+            .Where(e => !soloActivos || e.ActivoEnRol)
+            .OrderBy(e => e.PersonaInfo!.Apellido)
+            .ThenBy(e => e.PersonaInfo!.Nombre)
+            .ToListAsync();
+    }
+
+    public async Task CrearEmpleadoSpAsync(long dni, string nombre, string apellido, string email, long telefono, string password, int idRol, int idTurno)
+    {
+        await _context.Database.ExecuteSqlRawAsync(
+            "EXEC sp_Empleado_Crear @Dni = {0}, @Nombre = {1}, @Apellido = {2}, @Email = {3}, @Telefono = {4}, @Password = {5}, @IdRol = {6}, @IdTurno = {7}",
+            dni, nombre, apellido, email, telefono, password ?? "123456", idRol, idTurno);
+    }
+
+    public async Task BajaLogicaEmpleadoSpAsync(long dniEmpleado, int idRol)
+    {
+        await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE empleado SET activo_en_rol = 0 WHERE dni_empleado = {0} AND ({1} = 0 OR id_rol = {1})",
+            dniEmpleado, idRol);
+    }
+
+    public async Task RestaurarEmpleadoSpAsync(long dniEmpleado, int idRol)
+    {
+        await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE empleado SET activo_en_rol = 1 WHERE dni_empleado = {0} AND ({1} = 0 OR id_rol = {1})",
+            dniEmpleado, idRol);
+    }
 }
+

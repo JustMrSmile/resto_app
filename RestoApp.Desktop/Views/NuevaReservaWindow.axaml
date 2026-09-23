@@ -1,0 +1,94 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="RestoApp.Desktop.Views.NuevaReservaWindow"
+        Title="RestoApp - Registro de Reserva" 
+        Height="620" Width="520"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="#2C3E50">
+
+    <Border Background="White" CornerRadius="12" Margin="20" Padding="25">
+        <Grid RowDefinitions="Auto, *, Auto">
+            
+            <!-- ENCABEZADO MODAL -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <TextBlock Text="📅" FontSize="24" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="TxtTituloModal" Text="Datos de la Reserva" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="Complete los datos obligatorios para agendar la mesa" FontSize="12" Foreground="#7F8C8D" Margin="34,2,0,0"/>
+                <Separator Background="#BDC3C7" Margin="0,15,0,0"/>
+            </StackPanel>
+
+            <!-- FORMULARIO DE CAMPOS -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="14">
+                    
+                    <!-- Mensaje de Error / Alerta en Texto Rojo (Al inicio del formulario) -->
+                    <Border Background="#FDEDEC" BorderBrush="#E74C3C" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,5" IsVisible="{Binding #TxtError.IsVisible}">
+                        <TextBlock x:Name="TxtError" Foreground="#E74C3C" FontSize="12" FontWeight="Bold" IsVisible="False" TextWrapping="Wrap"/>
+                    </Border>
+
+                    <!-- Campo DNI Cliente (Primer Campo) -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="DNI del Cliente (Obligatorio):" Foreground="#34495E" FontWeight="Bold" FontSize="13"/>
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBox x:Name="TxtDni" PlaceholderText="Ingrese DNI (ej. 46452703)..." Height="38" VerticalContentAlignment="Center" TextChanged="TxtDni_TextChanged"/>
+                            <Button Grid.Column="1" Content="🔍 Verificar DNI" Click="BtnBuscarDni_Click" Margin="6,0,0,0" Height="38" Background="#3498DB" Foreground="White" CornerRadius="6" FontWeight="SemiBold" Cursor="Hand"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Campo Cliente (Autocompletado) -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Nombre del Cliente / Empresa:" Foreground="#34495E" FontWeight="Bold" FontSize="13"/>
+                        <TextBox x:Name="TxtCliente" PlaceholderText="Se autocompleta con el DNI ingresado..." IsReadOnly="True" Background="#F8F9F9" Height="38" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Selector de Fecha -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Fecha de la Reserva:" Foreground="#34495E" FontWeight="Bold" FontSize="13"/>
+                        <DatePicker x:Name="DpFecha" HorizontalAlignment="Stretch" Height="38"/>
+                    </StackPanel>
+
+                    <!-- Selector de Hora -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Hora de la Reserva:" Foreground="#34495E" FontWeight="Bold" FontSize="13"/>
+                        <TimePicker x:Name="TpHora" HorizontalAlignment="Stretch" Height="38" ClockIdentifier="24HourClock"/>
+                    </StackPanel>
+
+                    <!-- Campo Mesa Asignada (Sincronizado con BD) -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Mesa Asignada (Ubicación):" Foreground="#34495E" FontWeight="Bold" FontSize="13"/>
+                        <ComboBox x:Name="CboMesa" HorizontalAlignment="Stretch" Height="38"/>
+                    </StackPanel>
+
+                    <!-- Campo Evento (Sincronizado con BD) -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Evento Asociado:" Foreground="#34495E" FontWeight="Bold" FontSize="13"/>
+                        <ComboBox x:Name="CboEvento" HorizontalAlignment="Stretch" Height="38"/>
+                    </StackPanel>
+
+                    <!-- Campo Personas -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Cantidad de Personas:" Foreground="#34495E" FontWeight="Bold" FontSize="13"/>
+                        <TextBox x:Name="TxtPersonas" PlaceholderText="Ej. 4" Height="38" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- PIE CON BOTONES DE ACCIÓN -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12" Margin="0,20,0,0">
+                <Button Content="Cancelar" Click="BtnCancelar_Click" 
+                        Background="#95A5A6" Foreground="White" 
+                        Padding="18,10" CornerRadius="6" Cursor="Hand" FontWeight="SemiBold"/>
+                
+                <Button Content="💾 Guardar Reserva" Click="BtnGuardar_Click" 
+                        Background="#27AE60" Foreground="White" 
+                        Padding="20,10" CornerRadius="6" Cursor="Hand" FontWeight="Bold"/>
+            </StackPanel>
+
+        </Grid>
+    </Border>
+</Window>
+
+

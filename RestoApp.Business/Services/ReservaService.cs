@@ -1,3 +1,4 @@
+using System;
 using RestoApp.Data.Repositories;
 using RestoApp.Entities;
 using System.Collections.Generic;
@@ -16,9 +17,12 @@ public class ReservaService
 
     public async Task<IEnumerable<Reserva>> ObtenerReservasAsync()
     {
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         return await _reservaRepository.GetReservasConDetallesAsync(); 
 =======
+=======
+>>>>>>> 21109d7e49a11ad18a8cc2ff636f6db227a273a9
         return await _reservaRepository.GetReservasConDetallesAsync();
     }
 
@@ -82,10 +86,17 @@ public class ReservaService
             res.CantPersonas = cantPersonas;
             res.IdEstado = idEstado;
             res.DniCliente = dniCliente;
+<<<<<<< HEAD
             _reservaRepository.Update(res);
             await _reservaRepository.SaveChangesAsync();
             await _reservaRepository.ActualizarMesaReservaAsync(idReserva, idMesa);
         }
 >>>>>>> Stashed changes
+=======
+            await _reservaRepository.ActualizarMesaReservaAsync(idReserva, idMesa);
+            _reservaRepository.Update(res);
+            await _reservaRepository.SaveChangesAsync();
+        }
+>>>>>>> 21109d7e49a11ad18a8cc2ff636f6db227a273a9
     }
 }

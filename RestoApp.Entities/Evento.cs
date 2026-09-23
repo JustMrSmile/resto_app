@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,4 +13,16 @@ public class Evento
 
     [Column("nombre_evento")]
     public string NombreEvento { get; set; } = string.Empty;
+
+    [Column("fecha_evento")]
+    public DateTime? FechaEvento { get; set; }
+
+    [Column("descripcion")]
+    public string? Descripcion { get; set; }
+
+    [Column("es_activo")]
+    public bool EsActivo { get; set; } = true;
+
+    [NotMapped]
+    public int CantReservasVinculadas { get; set; } = 0;
 }

@@ -1,29 +1,33 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using RestoApp.Business.Services;
+using RestoApp.Desktop.Services;
 using RestoApp.Entities;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RestoApp.Desktop.ViewModels;
 
 public partial class ReservasViewModel : ObservableObject
 {
-
-
-    private readonly ReservaService _reservaService;
-
+    private readonly ReservaService? _reservaService;
 
     public bool PuedeAgregarEditar => SesionGlobal.RolActual == RolUsuario.Dueno
                         || SesionGlobal.RolActual == RolUsuario.Gerente
-                        || SesionGlobal.RolActual == RolUsuario.Recepcion
-                        || SesionGlobal.RolActual == RolUsuario.Cajero;
+                        || SesionGlobal.RolActual == RolUsuario.Recepcion;
+
     [ObservableProperty]
     private ObservableCollection<ReservaItemViewModel> _reservas = new();
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     public ReservasViewModel(ReservaService reservaService)
 =======
+=======
+>>>>>>> 21109d7e49a11ad18a8cc2ff636f6db227a273a9
     [ObservableProperty]
     private ObservableCollection<ReservaItemViewModel> _reservasFiltradas = new();
 
@@ -144,7 +148,11 @@ public partial class ReservasViewModel : ObservableObject
                         resItem.CantidadPersonas,
                         1,
                         resItem.DniCliente,
+<<<<<<< HEAD
                         idMesa);
+=======
+                        resItem.IdMesa > 0 ? resItem.IdMesa : null);
+>>>>>>> 21109d7e49a11ad18a8cc2ff636f6db227a273a9
                 }
                 else
                 {
@@ -237,41 +245,67 @@ public partial class ReservasViewModel : ObservableObject
     }
 
     public ReservasViewModel(ReservaService? reservaService = null)
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> 21109d7e49a11ad18a8cc2ff636f6db227a273a9
     {
         _reservaService = reservaService;
         _ = CargarReservasAsync();
     }
 
-// Reemplaza tu método CargarReservasAsync actual con este:
-public async Task CargarReservasAsync()
-{
-    var listaEntidades = await _reservaService.ObtenerReservasAsync();
-    var listaMapeada = new ObservableCollection<ReservaItemViewModel>();
-    
-    foreach (var r in listaEntidades)
+    public async Task CargarReservasAsync()
     {
-        // 1. Extraemos el nombre navegando hasta PersonaInfo
-        // (Asegúrate de que la propiedad de texto se llame 'Nombre' o cámbiala por la correcta)
-        string nombreCliente = r.Cliente?.PersonaInfo?.Nombre ?? "Consumidor Final";
+        var listaMapeada = new List<ReservaItemViewModel>();
 
-        // 2. Extraemos las mesas. Como 'Mesas' es una colección, unimos los números con comas (Ej: "4, 5")
-        string mesasAsignadas = r.Mesas != null && r.Mesas.Any()
-            ? string.Join(", ", r.Mesas.Select(m => m.NroMesa))
-            : "Sin asignar";
-
-        listaMapeada.Add(new ReservaItemViewModel
+        if (_reservaService != null)
         {
-            IdReserva = r.IdReserva,
-            FechaHora = r.FechaReserva.ToString("dd/MM/yyyy HH:mm"), 
-            ClienteNombre = nombreCliente,     // Usamos la variable calculada
-            NroMesa = mesasAsignadas,          // Usamos la variable calculada
-            CantidadPersonas = r.CantPersonas,
-            
-            
-        });
-    }
+            try
+            {
+                var listaEntidades = await _reservaService.ObtenerReservasAsync();
+                
+                foreach (var r in listaEntidades)
+                {
+                    string nombreCliente = r.Cliente?.PersonaInfo != null
+                        ? $"{r.Cliente.PersonaInfo.Nombre} {r.Cliente.PersonaInfo.Apellido}".Trim()
+                        : "Cliente General";
 
-    Reservas = listaMapeada;
-}
+                    string mesasAsignadas = r.Mesas != null && r.Mesas.Any()
+                        ? string.Join(", ", r.Mesas.Select(m => m.NroMesa))
+                        : "Sin asignar";
+
+                    int idMesaPrincipal = r.Mesas != null && r.Mesas.Any() ? r.Mesas.First().IdMesa : 0;
+
+                    listaMapeada.Add(new ReservaItemViewModel
+                    {
+                        IdReserva = r.IdReserva,
+                        FechaHora = r.FechaReserva.ToString("dd/MM/yyyy HH:mm"), 
+                        ClienteNombre = nombreCliente,
+                        DniCliente = r.DniCliente,
+                        IdMesa = idMesaPrincipal,
+                        NroMesa = mesasAsignadas,
+                        CantidadPersonas = r.CantPersonas,
+                        EstadoTexto = r.IdEstado == 2 ? "Cancelada" : "Confirmada"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[RESERVAS DB ERROR] Error al cargar reservas: {ex.Message}");
+                _ = AlertaService.MostrarAlertaConexionAsync();
+            }
+        }
+        else
+        {
+            _ = AlertaService.MostrarAlertaConexionAsync();
+        }
+
+        var activas = listaMapeada.Where(r => r.EstadoTexto != "Cancelada").ToList();
+        var bajas = listaMapeada.Where(r => r.EstadoTexto == "Cancelada").ToList();
+
+        Reservas = new ObservableCollection<ReservaItemViewModel>(activas);
+        ReservasBajas = new ObservableCollection<ReservaItemViewModel>(bajas);
+        CargarReservasBajas();
+        AplicarFiltro();
+    }
 }

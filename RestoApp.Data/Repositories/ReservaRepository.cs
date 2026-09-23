@@ -1,7 +1,11 @@
-using RestoApp.Entities;
-using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using RestoApp.Entities;
 
 namespace RestoApp.Data.Repositories;
 
@@ -12,13 +16,20 @@ public class ReservaRepository : Repository<Reserva>, IReservaRepository
     public async Task<IEnumerable<Reserva>> GetReservasConDetallesAsync()
     {
         return await _dbSet
-            .Include(r => r.Cliente)         // Trae el Cliente
-                .ThenInclude(c => c.PersonaInfo) // Trae los datos de la Persona (Nombre, DNI)
-            .Include(r => r.Mesas)           // Trae la lista de Mesas asignadas
+            .AsNoTracking()
+            .Include(r => r.Cliente)
+                .ThenInclude(c => c!.PersonaInfo)
+            .Include(r => r.Mesas)
+            .Include(r => r.Evento)
+            .Include(r => r.Estado)
+            .OrderByDescending(r => r.FechaReserva)
             .ToListAsync();
     }
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
+=======
+>>>>>>> 21109d7e49a11ad18a8cc2ff636f6db227a273a9
 
     public async Task<IEnumerable<Reserva>> GetReservasSpAsync()
     {
@@ -190,6 +201,7 @@ public class ReservaRepository : Repository<Reserva>, IReservaRepository
         return (int)(pOutput.Value != DBNull.Value ? pOutput.Value : 0);
     }
 
+<<<<<<< HEAD
     public async Task ActualizarMesaReservaAsync(int idReserva, int? idMesa)
     {
         var reserva = await _context.Reservas
@@ -214,11 +226,37 @@ public class ReservaRepository : Repository<Reserva>, IReservaRepository
         await _context.SaveChangesAsync();
     }
 
+=======
+>>>>>>> 21109d7e49a11ad18a8cc2ff636f6db227a273a9
     public async Task CambiarEstadoReservaSpAsync(int idReserva, int nuevoEstadoId)
     {
         await _context.Database.ExecuteSqlRawAsync(
             "EXEC sp_Reserva_CambiarEstado @IdReserva = {0}, @NuevoEstadoId = {1}",
             idReserva, nuevoEstadoId);
     }
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+
+    public async Task ActualizarMesaReservaAsync(int idReserva, int? idMesa)
+    {
+        var reserva = await _context.Reservas
+            .Include(r => r.Mesas)
+            .FirstOrDefaultAsync(r => r.IdReserva == idReserva);
+
+        if (reserva == null)
+            throw new InvalidOperationException($"No se encontró la reserva {idReserva}.");
+
+        reserva.Mesas.Clear();
+
+        if (idMesa.HasValue && idMesa.Value > 0)
+        {
+            var mesa = await _context.Mesas.FindAsync(idMesa.Value);
+            if (mesa == null)
+                throw new InvalidOperationException($"No se encontró la mesa {idMesa.Value}.");
+
+            reserva.Mesas.Add(mesa);
+        }
+    }
+>>>>>>> 21109d7e49a11ad18a8cc2ff636f6db227a273a9
 }
