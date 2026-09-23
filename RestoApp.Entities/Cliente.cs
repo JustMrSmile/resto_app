@@ -11,7 +11,7 @@ public class Cliente
     public long DniCliente { get; set; }
 
     [ForeignKey("DniCliente")]
-    public Persona? PersonaInfo { get; set; } // Propiedad de navegación
+    public Persona? PersonaInfo { get; set; }
 
     public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
 }

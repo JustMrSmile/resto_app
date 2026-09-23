@@ -20,11 +20,9 @@ public partial class LoginWindow : Window
             
             if (exito)
             {
-                // Instanciamos y mostramos la ventana principal
                 var mainWindow = new MainWindow();
                 mainWindow.Show();
                 
-                // Cerramos la ventana actual de login
                 this.Close();
             }
         }

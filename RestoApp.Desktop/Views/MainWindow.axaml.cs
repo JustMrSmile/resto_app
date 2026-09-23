@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     // Evento disparado en C# al hacer clic en cualquier botón del menú
     private void MenuButton_Click(object? sender, RoutedEventArgs e)
     {
+<<<<<<< Updated upstream
         // 1. Removemos la clase 'active' de todos los botones
         BtnClientes.Classes.Remove("active");
         BtnEmpleados.Classes.Remove("active");
@@ -22,6 +23,14 @@ public partial class MainWindow : Window
         BtnMesas.Classes.Remove("active");
 
         // 2. Identificamos qué botón disparó el evento y le añadimos la clase
+=======
+        BtnInicio?.Classes.Remove("active");
+        BtnReservas?.Classes.Remove("active");
+        BtnPersonal?.Classes.Remove("active");
+        BtnCaja?.Classes.Remove("active");
+        BtnEventos?.Classes.Remove("active");
+
+>>>>>>> Stashed changes
         if (sender is Button clickedButton)
         {
             clickedButton.Classes.Add("active");

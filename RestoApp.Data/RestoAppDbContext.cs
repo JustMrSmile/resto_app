@@ -21,9 +21,13 @@ public class RestoAppDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // Reemplaza "TU_SERVIDOR" por el nombre de tu instancia (ej. localhost\SQLEXPRESS)
+<<<<<<< Updated upstream
         optionsBuilder.UseSqlServer(@"Server=HERNAN\SQLEXPRESS;Database=proyect_Resto;Trusted_Connection=True;TrustServerCertificate=True;");
     }
 
+=======
+        optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=resto_DB;Integrated Security=True;TrustServerCertificate=True;");    }
+>>>>>>> Stashed changes
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Configuración fluida para la tabla intermedia muchos a muchos (reserva_mesa)
